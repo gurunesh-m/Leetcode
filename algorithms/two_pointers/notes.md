@@ -1171,3 +1171,766 @@ Start
   │
   └─ Working with linked list?
       └─ Yes → Fast/Slow
+```
+
+---
+
+## Advanced Techniques
+
+### 1. Three Pointers
+
+Sometimes problems require three simultaneous pointers.
+
+**Example: Dutch National Flag (Sort Colors)**
+
+```python
+# Python - Sort array of 0s, 1s, 2s
+def sort_colors(nums):
+    low, mid, high = 0, 0, len(nums) - 1
+    
+    while mid <= high:
+        if nums[mid] == 0:
+            nums[low], nums[mid] = nums[mid], nums[low]
+            low += 1
+            mid += 1
+        elif nums[mid] == 1:
+            mid += 1
+        else:  # nums[mid] == 2
+            nums[mid], nums[high] = nums[high], nums[mid]
+            high -= 1
+    
+    return nums
+```
+
+```javascript
+// JavaScript
+function sortColors(nums) {
+    let low = 0, mid = 0, high = nums.length - 1;
+    
+    while (mid <= high) {
+        if (nums[mid] === 0) {
+            [nums[low], nums[mid]] = [nums[mid], nums[low]];
+            low++;
+            mid++;
+        } else if (nums[mid] === 1) {
+            mid++;
+        } else {  // nums[mid] === 2
+            [nums[mid], nums[high]] = [nums[high], nums[mid]];
+            high--;
+        }
+    }
+    
+    return nums;
+}
+```
+
+```java
+// Java
+public void sortColors(int[] nums) {
+    int low = 0, mid = 0, high = nums.length - 1;
+    
+    while (mid <= high) {
+        if (nums[mid] == 0) {
+            int temp = nums[low];
+            nums[low] = nums[mid];
+            nums[mid] = temp;
+            low++;
+            mid++;
+        } else if (nums[mid] == 1) {
+            mid++;
+        } else {  // nums[mid] == 2
+            int temp = nums[mid];
+            nums[mid] = nums[high];
+            nums[high] = temp;
+            high--;
+        }
+    }
+}
+```
+
+### 2. Pointers with Different Speeds
+
+**Example: Remove Nth Node From End of List**
+
+```python
+# Python
+def remove_nth_from_end(head, n):
+    dummy = ListNode(0)
+    dummy.next = head
+    fast = slow = dummy
+    
+    # Move fast n steps ahead
+    for _ in range(n):
+        fast = fast.next
+    
+    # Move both until fast reaches end
+    while fast.next:
+        fast = fast.next
+        slow = slow.next
+    
+    # Remove nth node
+    slow.next = slow.next.next
+    
+    return dummy.next
+```
+
+```javascript
+// JavaScript
+function removeNthFromEnd(head, n) {
+    const dummy = new ListNode(0);
+    dummy.next = head;
+    let fast = dummy, slow = dummy;
+    
+    // Move fast n steps ahead
+    for (let i = 0; i < n; i++) {
+        fast = fast.next;
+    }
+    
+    // Move both until fast reaches end
+    while (fast.next) {
+        fast = fast.next;
+        slow = slow.next;
+    }
+    
+    // Remove nth node
+    slow.next = slow.next.next;
+    
+    return dummy.next;
+}
+```
+
+```java
+// Java
+public ListNode removeNthFromEnd(ListNode head, int n) {
+    ListNode dummy = new ListNode(0);
+    dummy.next = head;
+    ListNode fast = dummy, slow = dummy;
+    
+    // Move fast n steps ahead
+    for (int i = 0; i < n; i++) {
+        fast = fast.next;
+    }
+    
+    // Move both until fast reaches end
+    while (fast.next != null) {
+        fast = fast.next;
+        slow = slow.next;
+    }
+    
+    // Remove nth node
+    slow.next = slow.next.next;
+    
+    return dummy.next;
+}
+```
+
+### 3. Combining Two Pointers with Hash Map
+
+For problems requiring both O(n) lookup and two-pointer logic.
+
+**Example: Subarray Sum Equals K**
+
+```python
+# Python
+def subarray_sum(nums, k):
+    count = 0
+    current_sum = 0
+    sum_freq = {0: 1}  # Handle subarrays starting from index 0
+    
+    for num in nums:
+        current_sum += num
+        
+        # Check if (current_sum - k) exists
+        if current_sum - k in sum_freq:
+            count += sum_freq[current_sum - k]
+        
+        # Add current sum to map
+        sum_freq[current_sum] = sum_freq.get(current_sum, 0) + 1
+    
+    return count
+```
+
+```javascript
+// JavaScript
+function subarraySum(nums, k) {
+    let count = 0;
+    let currentSum = 0;
+    const sumFreq = new Map([[0, 1]]);  // Handle subarrays from index 0
+    
+    for (const num of nums) {
+        currentSum += num;
+        
+        // Check if (currentSum - k) exists
+        if (sumFreq.has(currentSum - k)) {
+            count += sumFreq.get(currentSum - k);
+        }
+        
+        // Add current sum to map
+        sumFreq.set(currentSum, (sumFreq.get(currentSum) || 0) + 1);
+    }
+    
+    return count;
+}
+```
+
+```java
+// Java
+public int subarraySum(int[] nums, int k) {
+    int count = 0;
+    int currentSum = 0;
+    Map<Integer, Integer> sumFreq = new HashMap<>();
+    sumFreq.put(0, 1);  // Handle subarrays from index 0
+    
+    for (int num : nums) {
+        currentSum += num;
+        
+        // Check if (currentSum - k) exists
+        if (sumFreq.containsKey(currentSum - k)) {
+            count += sumFreq.get(currentSum - k);
+        }
+        
+        // Add current sum to map
+        sumFreq.put(currentSum, sumFreq.getOrDefault(currentSum, 0) + 1);
+    }
+    
+    return count;
+}
+```
+
+### 4. Binary Search + Two Pointers
+
+Combine binary search efficiency with two-pointer validation.
+
+**Example: Find K Closest Elements**
+
+```python
+# Python
+def find_closest_elements(arr, k, x):
+    # Binary search for insertion point
+    left, right = 0, len(arr) - k
+    
+    while left < right:
+        mid = (left + right) // 2
+        # Compare distances from x
+        if x - arr[mid] > arr[mid + k] - x:
+            left = mid + 1
+        else:
+            right = mid
+    
+    return arr[left:left + k]
+```
+
+```javascript
+// JavaScript
+function findClosestElements(arr, k, x) {
+    // Binary search for insertion point
+    let left = 0, right = arr.length - k;
+    
+    while (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        // Compare distances from x
+        if (x - arr[mid] > arr[mid + k] - x) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    
+    return arr.slice(left, left + k);
+}
+```
+
+```java
+// Java
+public List<Integer> findClosestElements(int[] arr, int k, int x) {
+    // Binary search for insertion point
+    int left = 0, right = arr.length - k;
+    
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        // Compare distances from x
+        if (x - arr[mid] > arr[mid + k] - x) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    
+    List<Integer> result = new ArrayList<>();
+    for (int i = left; i < left + k; i++) {
+        result.add(arr[i]);
+    }
+    return result;
+}
+```
+
+### 5. Backtracking with Two Pointers
+
+For problems requiring exploration of multiple possibilities.
+
+**Example: Trapping Rain Water**
+
+```python
+# Python
+def trap_rain_water(height):
+    if not height:
+        return 0
+    
+    left, right = 0, len(height) - 1
+    left_max, right_max = height[left], height[right]
+    water = 0
+    
+    while left < right:
+        if left_max < right_max:
+            left += 1
+            left_max = max(left_max, height[left])
+            water += left_max - height[left]
+        else:
+            right -= 1
+            right_max = max(right_max, height[right])
+            water += right_max - height[right]
+    
+    return water
+```
+
+```javascript
+// JavaScript
+function trapRainWater(height) {
+    if (height.length === 0) return 0;
+    
+    let left = 0, right = height.length - 1;
+    let leftMax = height[left], rightMax = height[right];
+    let water = 0;
+    
+    while (left < right) {
+        if (leftMax < rightMax) {
+            left++;
+            leftMax = Math.max(leftMax, height[left]);
+            water += leftMax - height[left];
+        } else {
+            right--;
+            rightMax = Math.max(rightMax, height[right]);
+            water += rightMax - height[right];
+        }
+    }
+    
+    return water;
+}
+```
+
+```java
+// Java
+public int trapRainWater(int[] height) {
+    if (height.length == 0) return 0;
+    
+    int left = 0, right = height.length - 1;
+    int leftMax = height[left], rightMax = height[right];
+    int water = 0;
+    
+    while (left < right) {
+        if (leftMax < rightMax) {
+            left++;
+            leftMax = Math.max(leftMax, height[left]);
+            water += leftMax - height[left];
+        } else {
+            right--;
+            rightMax = Math.max(rightMax, height[right]);
+            water += rightMax - height[right];
+        }
+    }
+    
+    return water;
+}
+```
+
+---
+
+## Practice Problems
+
+### Beginner Level
+
+1. **Two Sum II - Input Array Is Sorted**
+   - Pattern: Opposite Direction
+   - Difficulty: Easy
+   - Key: Adjust pointers based on sum comparison
+
+2. **Valid Palindrome**
+   - Pattern: Opposite Direction
+   - Difficulty: Easy
+   - Key: Skip non-alphanumeric characters
+
+3. **Remove Duplicates from Sorted Array**
+   - Pattern: Same Direction
+   - Difficulty: Easy
+   - Key: Slow pointer tracks unique position
+
+4. **Merge Sorted Array**
+   - Pattern: Opposite Direction (from end)
+   - Difficulty: Easy
+   - Key: Fill from right to avoid overwrites
+
+5. **Move Zeroes**
+   - Pattern: Same Direction
+   - Difficulty: Easy
+   - Key: Swap non-zero elements forward
+
+### Intermediate Level
+
+6. **3Sum**
+   - Pattern: Opposite Direction + Loop
+   - Difficulty: Medium
+   - Key: Fix one element, two pointers for rest
+
+7. **Container With Most Water**
+   - Pattern: Opposite Direction
+   - Difficulty: Medium
+   - Key: Move pointer with smaller height
+
+8. **Longest Substring Without Repeating Characters**
+   - Pattern: Sliding Window
+   - Difficulty: Medium
+   - Key: Expand right, contract left on duplicates
+
+9. **Find the Duplicate Number**
+   - Pattern: Fast/Slow (Floyd's Cycle Detection)
+   - Difficulty: Medium
+   - Key: Treat array as linked list
+
+10. **Sort Colors**
+    - Pattern: Three Pointers
+    - Difficulty: Medium
+    - Key: Dutch National Flag algorithm
+
+11. **Minimum Size Subarray Sum**
+    - Pattern: Sliding Window
+    - Difficulty: Medium
+    - Key: Expand until valid, then contract
+
+12. **Linked List Cycle II**
+    - Pattern: Fast/Slow
+    - Difficulty: Medium
+    - Key: Find meeting point, then find start
+
+### Advanced Level
+
+13. **Trapping Rain Water**
+    - Pattern: Opposite Direction
+    - Difficulty: Hard
+    - Key: Track max heights from both sides
+
+14. **Minimum Window Substring**
+    - Pattern: Sliding Window + Hash Map
+    - Difficulty: Hard
+    - Key: Expand until valid, contract to minimize
+
+15. **Longest Duplicate Substring**
+    - Pattern: Binary Search + Sliding Window
+    - Difficulty: Hard
+    - Key: Binary search on length, validate with window
+
+16. **Subarrays with K Different Integers**
+    - Pattern: Sliding Window
+    - Difficulty: Hard
+    - Key: Count(at most K) - Count(at most K-1)
+
+17. **Median of Two Sorted Arrays**
+    - Pattern: Binary Search + Two Pointers
+    - Difficulty: Hard
+    - Key: Partition arrays for equal halves
+
+### Problem-Solving Tips
+
+**For Each Problem:**
+
+1. **Read Carefully**: Identify constraints and requirements
+2. **Draw Examples**: Visualize with small test cases
+3. **Identify Pattern**: Match to one of the four main patterns
+4. **Plan Before Coding**: Outline pointer movements
+5. **Handle Edge Cases**: Empty, single element, all same
+6. **Test Incrementally**: Verify with multiple test cases
+7. **Optimize**: Look for unnecessary operations
+
+---
+
+## Common Pitfalls and How to Avoid Them
+
+### 1. Off-by-One Errors
+
+**Problem:** Incorrect loop conditions or pointer updates.
+
+```python
+# ❌ Wrong
+while left <= right:  # May process same element twice
+    
+# ✅ Correct
+while left < right:  # Stops when pointers meet
+```
+
+### 2. Not Handling Duplicates
+
+**Problem:** Results include duplicate triplets/pairs.
+
+```python
+# ❌ Wrong - doesn't skip duplicates
+for i in range(len(nums)):
+    # ... two pointer logic
+
+# ✅ Correct - skip duplicates
+for i in range(len(nums)):
+    if i > 0 and nums[i] == nums[i-1]:
+        continue
+    # ... two pointer logic
+```
+
+### 3. Forgetting to Sort
+
+**Problem:** Two pointers require sorted data but array isn't sorted.
+
+```python
+# ❌ Wrong - using two pointers on unsorted array
+def two_sum(nums, target):
+    left, right = 0, len(nums) - 1
+    # This won't work correctly!
+
+# ✅ Correct - sort first if needed
+def two_sum_sorted(nums, target):
+    nums.sort()  # Or ensure input is sorted
+    left, right = 0, len(nums) - 1
+```
+
+### 4. Incorrect Window Expansion/Contraction
+
+**Problem:** Not maintaining valid window state.
+
+```python
+# ❌ Wrong - doesn't maintain valid window
+while right < len(arr):
+    add_to_window(arr[right])
+    if not valid():
+        left += 1  # Only moves once!
+
+# ✅ Correct - contract until valid
+while right < len(arr):
+    add_to_window(arr[right])
+    while not valid():  # Keep contracting
+        remove_from_window(arr[left])
+        left += 1
+```
+
+### 5. Infinite Loops in Linked Lists
+
+**Problem:** Not checking for null pointers.
+
+```python
+# ❌ Wrong - crashes on odd-length lists
+while fast.next:  # What if fast is None?
+    fast = fast.next.next
+
+# ✅ Correct - check both conditions
+while fast and fast.next:
+    fast = fast.next.next
+```
+
+### 6. Modifying Array While Iterating
+
+**Problem:** Unexpected behavior when array changes during iteration.
+
+```python
+# ❌ Wrong - modifying during iteration
+for i in range(len(arr)):
+    if condition:
+        arr.pop(i)  # Changes indices!
+
+# ✅ Correct - use two pointers
+slow = 0
+for fast in range(len(arr)):
+    if keep_condition(arr[fast]):
+        arr[slow] = arr[fast]
+        slow += 1
+```
+
+---
+
+## Optimization Techniques
+
+### 1. Early Termination
+
+Stop processing when answer is found or impossible.
+
+```python
+# Early termination in 3Sum
+if nums[i] > 0:
+    break  # All remaining numbers are positive
+```
+
+### 2. Skip Redundant Work
+
+Avoid processing duplicate elements.
+
+```python
+# Skip duplicates efficiently
+while left < right and nums[left] == nums[left + 1]:
+    left += 1
+```
+
+### 3. Precomputation
+
+Calculate values before pointer movement.
+
+```python
+# Precompute prefix sums for range queries
+prefix_sum = [0]
+for num in nums:
+    prefix_sum.append(prefix_sum[-1] + num)
+```
+
+### 4. Reverse Thinking
+
+Sometimes iterating backwards is more efficient.
+
+```python
+# Merge sorted arrays from end to avoid overwrites
+while p1 >= 0 and p2 >= 0:
+    if nums1[p1] > nums2[p2]:
+        nums1[p] = nums1[p1]
+        p1 -= 1
+    else:
+        nums1[p] = nums2[p2]
+        p2 -= 1
+    p -= 1
+```
+
+---
+
+## Testing Strategies
+
+### Essential Test Cases
+
+1. **Empty Input**: `[]`
+2. **Single Element**: `[1]`
+3. **Two Elements**: `[1, 2]`
+4. **All Same**: `[1, 1, 1, 1]`
+5. **Already Sorted**: `[1, 2, 3, 4]`
+6. **Reverse Sorted**: `[4, 3, 2, 1]`
+7. **No Solution**: When target can't be found
+8. **Multiple Solutions**: Verify all are found
+9. **Minimum Values**: `[INT_MIN, ...]`
+10. **Maximum Values**: `[..., INT_MAX]`
+
+### Debugging Checklist
+
+- [ ] Are pointers initialized correctly?
+- [ ] Is the loop condition correct (`<` vs `<=`)?
+- [ ] Are both pointers updated properly?
+- [ ] Are edge cases handled?
+- [ ] Is the array sorted when required?
+- [ ] Are duplicates handled if needed?
+- [ ] Is the window state maintained correctly?
+- [ ] Are null checks in place for linked lists?
+
+---
+
+## Comparison with Other Techniques
+
+| Technique | Time | Space | Use Case |
+|-----------|------|-------|----------|
+| Two Pointers | O(n) | O(1) | Sorted data, pairs, in-place |
+| Hash Map | O(n) | O(n) | Unsorted data, any lookup |
+| Binary Search | O(log n) | O(1) | Sorted, single element search |
+| Sliding Window | O(n) | O(k) | Contiguous subarrays |
+| Dynamic Programming | O(n²) | O(n) | Overlapping subproblems |
+
+### When to Choose Two Pointers Over Others
+
+**Choose Two Pointers:**
+- Data is sorted or can be sorted efficiently
+- Need O(1) space complexity
+- Looking for pairs/relationships between elements
+- In-place modification required
+
+**Choose Hash Map Instead:**
+- Data cannot be sorted
+- Need O(1) lookup for arbitrary keys
+- Order doesn't matter
+
+**Choose Sliding Window Instead:**
+- Need to track contiguous subarray state
+- Window size varies dynamically
+- Optimizing substring/subarray problems
+
+---
+
+## Real-World Applications
+
+1. **Database Query Optimization**: Merge operations on sorted result sets
+2. **Memory Management**: Compacting fragmented memory blocks
+3. **Network Packet Processing**: Finding pairs of request-response packets
+4. **Data Deduplication**: Removing duplicate entries efficiently
+5. **String Matching**: Finding patterns in DNA sequences
+6. **Computer Graphics**: Polygon intersection detection
+7. **Financial Analysis**: Finding trading opportunities in sorted price data
+8. **Image Processing**: Edge detection and contour finding
+
+---
+
+## Conclusion
+
+The Two Pointers technique is a fundamental algorithmic pattern that every programmer should master. Its elegance lies in its simplicity and efficiency.
+
+### Key Takeaways
+
+✅ **Four Main Patterns**: Opposite direction, same direction, sliding window, fast/slow
+✅ **When to Use**: Sorted data, pairs/triplets, in-place operations, linked lists
+✅ **Complexity**: Usually O(n) time with O(1) space
+✅ **Versatility**: Applicable to arrays, strings, and linked lists
+✅ **Foundation**: Understanding this builds intuition for more complex algorithms
+
+### Next Steps
+
+1. **Practice Daily**: Solve 2-3 problems using different patterns
+2. **Recognize Patterns**: Train yourself to identify when two pointers apply
+3. **Optimize**: Try converting O(n²) solutions to O(n) using two pointers
+4. **Combine Techniques**: Learn to use with binary search, hash maps, etc.
+5. **Teach Others**: Explaining concepts solidifies understanding
+
+### Resources for Further Learning
+
+- LeetCode Two Pointers Tag
+- AlgoExpert Two Pointers Section
+- Cracking the Coding Interview - Chapter 7
+- Elements of Programming Interviews - Arrays Chapter
+
+---
+
+## Quick Reference Cheat Sheet
+
+```python
+# Template Selection Guide
+
+# 1. OPPOSITE DIRECTION (Converging)
+left, right = 0, len(arr) - 1
+while left < right:
+    if condition: return result
+    elif move_left: left += 1
+    else: right -= 1
+
+# 2. SAME DIRECTION (Chasing)
+slow = 0
+for fast in range(len(arr)):
+    if condition: arr[slow] = arr[fast]; slow += 1
+
+# 3. SLIDING WINDOW
+left = 0
+for right in range(len(arr)):
+    expand_window(right)
+    while invalid(): contract_window(left); left += 1
+
+# 4. FAST/SLOW (Linked List)
+slow = fast = head
+while fast and fast.next:
+    slow = slow.next
+    fast = fast.next.next
+    if slow == fast: return True
+```
+
+**Remember**: The key to mastering two pointers is recognizing the pattern, not memorizing code!
