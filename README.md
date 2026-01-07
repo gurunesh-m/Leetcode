@@ -7,3 +7,5 @@ The goal is to keep track of problems I have solved and the concepts I am learni
 Solutions are added as I practice. Code quality and optimization may vary.
 
 This repository is for personal learning and reference.
+
+now also has the solution from the placement training
