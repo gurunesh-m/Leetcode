@@ -1,4 +1,4 @@
-```md
+
 # 🧮 Container With Most Water
 
 ## 🔗 Problem Link
@@ -22,7 +22,6 @@ Find **two lines** that together with the x-axis form a container, such that the
 The amount of water stored between two lines depends on:
 - **Width** = distance between indices
 - **Height** = minimum of the two line heights
-
 ```
 
 Area = min(height[left], height[right]) × (right - left)
